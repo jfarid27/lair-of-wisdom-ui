@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import Onboard from 'bnc-onboard';
 import Web3 from 'web3';
+import setupContracts from "../actions/setupContracts";
 
 export const Login = async (state, updateAppState) => {
   const onboard = Onboard({
@@ -26,6 +27,7 @@ export const Login = async (state, updateAppState) => {
   await onboard.walletSelect();
   await onboard.walletCheck();
   await Promise.resolve();
+
   updateAppState((st)  => {
     st.loggedIn = true;
     return { ...st };
@@ -37,6 +39,13 @@ export const AccountContext = createContext({});
 export default function Account({ children }) {
 
   const [accountState, dispatch] = useState({});
+
+
+
+  useEffect(() => {
+    if (!accountState.loggedIn || !accountState.web3) return;
+    setupContracts(accountState, dispatch);
+  }, [accountState])
 
   return <AccountContext.Provider value={ { accountState, dispatch, Login } }>
     { children }
