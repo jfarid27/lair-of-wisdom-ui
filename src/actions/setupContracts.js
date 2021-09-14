@@ -17,7 +17,6 @@ export default async function setupContracts(state, dispatch) {
 
     dispatch(st => {
       st.contracts = { Lair, Dragons, Eggs };
-      debugger
       return st;
     });
   } catch (err) {
