@@ -1,9 +1,10 @@
 # Lair of Wisdom
 
+This is a UI for [Lair of Wisdom](https://nourharidy.medium.com/lair-of-wisdom-on-chain-co-op-pvp-mmo-game-guide-rules-82422209eeb5).
 
 ## Development
 
-This project is configured with gitpod. [Click here to open and run.](https://gitpod.io/#https://github.com/jfarid27/lair-of-wisdom-ui)
+This project is configured with gitpod. [Click here to open and create a new workspace.](https://gitpod.io/#https://github.com/jfarid27/lair-of-wisdom-ui)
 
 
 ## Available Scripts
