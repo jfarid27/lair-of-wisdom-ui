@@ -1,6 +1,10 @@
-# Getting Started with Create React App
+# Lair of Wisdom
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Development
+
+This project is configured with gitpod. [Click here to open and run.](https://gitpod.io/#https://github.com/jfarid27/lair-of-wisdom-ui)
+
 
 ## Available Scripts
 
