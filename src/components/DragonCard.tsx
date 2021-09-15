@@ -62,7 +62,7 @@ function DragonAction ({ action, callData, classes, updateCallData}: DragonActio
     })
   }
 
-  return <Grid item xs={3} key={action.name}>
+  return <Grid item xs={4} key={action.name}>
     <Paper variant="outlined" onClick={() => handleClose(true)} className={classes.root}>
       <action.Icon />
       <p>{action.name}</p>
@@ -117,7 +117,7 @@ export function DragonCard({ dragon } : DragonCardProps) {
 
   return (<Grid item xs={3}>
     <Paper variant="outlined" className={classesCard.root}>
-      <Blockies seed={dragon.address} />
+      <Blockies seed={dragon.address} size={30} />
       <h3>{dragon.name}</h3>
       <h5>Trust: {dragon.playerTrust}</h5>
       <Grid container>
