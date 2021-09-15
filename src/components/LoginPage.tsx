@@ -11,7 +11,7 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <h1>Lair of Wisdom</h1>
-      <p>An Ethereum based MMO RPG.</p>
+      <p>An Fantom based MMO RPG. Please <a href="https://docs.fantom.foundation/tutorials/set-up-metamask" target="_blank">setup Fantom</a> and login.</p>
       <Button onClick={() => Login(accountState, dispatch)} variant="outlined" size="large">Login</Button>
     </div>
   );

@@ -1,18 +1,33 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { AccountContext } from './account';
+import BN from 'bn.js';
 
 /**
  * Updates the dragons game state and data using given contracts.
  * @param {*} contracts
  * @param {*} dispatch
  */
-async function updateDragonState(contracts: any, dispatch: any) {
+async function updateDragonState(accountState: any, dispatch: any) {
+  const { contracts, web3 } = accountState;
   try {
     const dragons = await Promise.all(contracts.Dragons.map(async (dragon: any) => {
       const name = await dragon.methods.name().call();
+      const maxHealth = await dragon.methods.maxHealth().call();
+      const health = await dragon.methods.health().call();
+      const attackCooldown = await dragon.methods.attackCooldown().call();
+      const playerTrust = await dragon.methods.trust(accountState.address).call();
+      const canAttack = await dragon.methods.canAttack().call();
+      const canBreed = await dragon.methods.canBreed().call();
+
       return {
         address: dragon.options.address,
-        name
+        name,
+        health,
+        maxHealth,
+        attackCooldown,
+        playerTrust,
+        canAttack,
+        canBreed
       };
     }));
     dispatch((state: any) => {
@@ -30,8 +45,8 @@ async function updateDragonState(contracts: any, dispatch: any) {
  * @param {*} contracts 
  * @param {*} dispatch 
  */
-async function updateGameState(contracts: any, dispatch: any) {
-  updateDragonState(contracts, dispatch);
+async function updateGameState(accountState: any, dispatch: any) {
+  updateDragonState(accountState, dispatch);
 }
 
 /**
@@ -61,7 +76,7 @@ export const GameContext = createContext<GameState>(defaultGameState);
 
   useEffect(() => {
     if (!accountState.contracts) return;
-    updateGameState(accountState.contracts, dispatch);
+    updateGameState(accountState, dispatch);
   }, [accountState, accountState.contracts]);
 
   return <GameContext.Provider value={ gameState }>
