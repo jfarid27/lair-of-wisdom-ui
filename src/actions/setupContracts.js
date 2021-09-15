@@ -26,7 +26,6 @@ export async function setupGameContracts(state) {
  * @param {*} dispatch
  */
 export default async function setupContracts(state, dispatch) {
-
   const { web3 } = state;
   if (!web3) return;
 
@@ -34,9 +33,10 @@ export default async function setupContracts(state, dispatch) {
     const { Lair, Dragons, Eggs } = await setupGameContracts(state);
     dispatch(st => {
       st.contracts = { Lair, Dragons, Eggs };
-      return st;
+      return { ...st };
     });
   } catch (err) {
+    console.log(err)
     // TODO: Add contract failure error handling.
   }
 }

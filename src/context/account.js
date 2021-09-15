@@ -41,7 +41,7 @@ export const Login = async (state, updateAppState) => {
 }
 
 /**
- * React Context Object.
+ * React Context Object for web3 login and account information.
  */
 export const AccountContext = createContext({});
 
@@ -51,13 +51,11 @@ export const AccountContext = createContext({});
  * @returns ReactComponent
  */
 export default function Account({ children }) {
-
   const [accountState, dispatch] = useState({});
-
   useEffect(() => {
-    if (!accountState.loggedIn || !accountState.web3) return;
+    if (accountState.contracts) return;
     setupContracts(accountState, dispatch);
-  }, [accountState])
+  }, [accountState, accountState.loggedIn, accountState.web3])
 
   return <AccountContext.Provider value={ { accountState, dispatch, Login } }>
     { children }
