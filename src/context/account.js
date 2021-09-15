@@ -3,6 +3,12 @@ import Onboard from 'bnc-onboard';
 import Web3 from 'web3';
 import setupContracts from "../actions/setupContracts";
 
+/**
+ * Makes an async call to the Onboard modal to setup the user account.
+ * @param {} state State object to read from.
+ * @param {*} updateAppState Dispatch callback to update the state.
+ * @async
+ */
 export const Login = async (state, updateAppState) => {
   const onboard = Onboard({
     networkId: 250,
@@ -34,13 +40,19 @@ export const Login = async (state, updateAppState) => {
   });
 }
 
+/**
+ * React Context Object.
+ */
 export const AccountContext = createContext({});
 
+/**
+ * Component mixer for the Account Context.
+ * @param {*} param0 
+ * @returns ReactComponent
+ */
 export default function Account({ children }) {
 
   const [accountState, dispatch] = useState({});
-
-
 
   useEffect(() => {
     if (!accountState.loggedIn || !accountState.web3) return;

@@ -4,7 +4,9 @@ This is a UI for [Lair of Wisdom](https://nourharidy.medium.com/lair-of-wisdom-o
 
 ## Development
 
-This project is configured with gitpod. [Click here to open and create a new workspace.](https://gitpod.io/#https://github.com/jfarid27/lair-of-wisdom-ui)
+This project is a fork of [Create React App](https://create-react-app.dev/).
+
+This project is configured with gitpod. [Click here to open and create a new workspace](https://gitpod.io/#https://github.com/jfarid27/lair-of-wisdom-ui).
 
 
 ## Available Scripts
