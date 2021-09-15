@@ -3,12 +3,17 @@ import { AccountContext } from './account';
 
 
 import Whatshot from '@material-ui/icons/Whatshot';
+import Fastfood from '@material-ui/icons/Fastfood';
 import Hotel from '@material-ui/icons/Hotel';
 import BathtubIcon from '@material-ui/icons/Bathtub';
 import ChildCareIcon from '@material-ui/icons/ChildCare';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import Healing from '@material-ui/icons/Healing';
 import BN from "bn.js";
+import { truncateSync } from "fs";
+
+const NEEDS_THRESHOLD = 5
 
 /**
  * Updates the dragons game state and data using given contracts.
@@ -27,7 +32,11 @@ async function updateDragonState(accountState: any, dispatch: any) {
         playerTrust,
         healthRegeneration,
         damage,
-        canDragonAttack
+        canDragonAttack,
+        getHunger,
+        getSleepiness,
+        getUncleanliness,
+        getBoredom
       ] = await Promise.all([
         dragon.methods.name().call(),
         dragon.methods.maxHealth().call(),
@@ -36,15 +45,35 @@ async function updateDragonState(accountState: any, dispatch: any) {
         dragon.methods.trust(accountState.address).call(),
         dragon.methods.healthRegeneration().call(),
         dragon.methods.damage().call(),
-        dragon.methods.canAttack().call()
+        dragon.methods.canAttack().call(),
+        dragon.methods.getHunger().call(),
+        dragon.methods.getSleepiness().call(),
+        dragon.methods.getUncleanliness().call(),
+        dragon.methods.getBoredom().call()
       ])
 
       const canAttack = canDragonAttack && (new BN(playerTrust)).gte(new BN('4'));
       const canProposeBreed = (new BN(playerTrust)).gte(new BN('10'));
       const canAcceptBreed = (new BN(playerTrust)).gte(new BN('10'));
 
-      const availableActions = [
-        {
+      const availableActions = []
+
+      if(getHunger > NEEDS_THRESHOLD) {
+        availableActions.push({
+          name: 'Feed',
+          Icon: Fastfood,
+          isCallData: false,
+          call: async (callData: any) => {
+            await dragon.methods.feed().send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
+        })
+      }
+
+      if(getSleepiness > NEEDS_THRESHOLD) {
+        availableActions.push({
           name: 'Sleep',
           Icon: Hotel,
           isCallData: false,
@@ -54,8 +83,11 @@ async function updateDragonState(accountState: any, dispatch: any) {
             })
             resetContracts();
           }
-        },
-        {
+        })
+      }
+
+      if(getUncleanliness > NEEDS_THRESHOLD) {
+        availableActions.push({
           name: 'Clean',
           Icon: BathtubIcon,
           isCallData: false,
@@ -65,8 +97,11 @@ async function updateDragonState(accountState: any, dispatch: any) {
             })
             resetContracts();
           }
-        },
-        {
+        })
+      }
+
+      if(getBoredom > NEEDS_THRESHOLD) {
+        availableActions.push({
           name: 'Play',
           Icon: SportsEsportsIcon,
           isCallData: false,
@@ -76,8 +111,22 @@ async function updateDragonState(accountState: any, dispatch: any) {
             })
             resetContracts();
           }
-        }
-      ];
+        })
+      }
+
+      if(maxHealth - health >= healthRegeneration && playerTrust >= 1) {
+        availableActions.push({
+          name: 'Heal',
+          Icon: Healing,
+          isCallData: true,
+          call: async (callData: any) => {
+            await dragon.methods.heal().send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
+        })
+      }
 
       if (canProposeBreed) {
         availableActions.push({
