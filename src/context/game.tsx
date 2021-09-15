@@ -19,14 +19,25 @@ async function updateDragonState(accountState: any, dispatch: any) {
   const { contracts, resetContracts } = accountState;
   try {
     const dragons = await Promise.all(contracts.Dragons.map(async (dragon: any) => {
-      const name = await dragon.methods.name().call();
-      const maxHealth = await dragon.methods.maxHealth().call();
-      const health = await dragon.methods.health().call();
-      const attackCooldown = await dragon.methods.attackCooldown().call();
-      const playerTrust = await dragon.methods.trust(accountState.address).call();
-      const healthRegeneration = await dragon.methods.healthRegeneration().call();
-      const damage = await dragon.methods.damage().call();
-      const canDragonAttack = await dragon.methods.canAttack().call();
+      const [
+        name,
+        maxHealth,
+        health,
+        attackCooldown,
+        playerTrust,
+        healthRegeneration,
+        damage,
+        canDragonAttack
+      ] = await Promise.all([
+        dragon.methods.name().call(),
+        dragon.methods.maxHealth().call(),
+        dragon.methods.health().call(),
+        dragon.methods.attackCooldown().call(),
+        dragon.methods.trust(accountState.address).call(),
+        dragon.methods.healthRegeneration().call(),
+        dragon.methods.damage().call(),
+        dragon.methods.canAttack().call()
+      ])
 
       const canAttack = canDragonAttack && (new BN(playerTrust)).gte(new BN('4'));
       const canProposeBreed = (new BN(playerTrust)).gte(new BN('10'));
