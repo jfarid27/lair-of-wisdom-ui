@@ -32,11 +32,20 @@ async function updateDragonState(accountState: any, dispatch: any) {
       const canProposeBreed = (new BN(playerTrust)).gte(new BN('10'));
       const canAcceptBreed = (new BN(playerTrust)).gte(new BN('10'));
 
-      const availableActions = [
+      interface AvailableAction {
+        name: string,
+        Icon: any,
+        isCallData: boolean,
+        callData: Array<String>,
+        call: (callData: any) => Promise<void>
+      }
+
+      const availableActions: Array<AvailableAction> = [
         {
           name: 'Sleep',
           Icon: Hotel,
           isCallData: false,
+          callData: [],
           call: async (callData: any) => {
             await dragon.methods.sleep().send({
               from: accountState.address
@@ -48,6 +57,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
           name: 'Clean',
           Icon: BathtubIcon,
           isCallData: false,
+          callData: [],
           call: async (callData: any) => {
             await dragon.methods.clean().send({
               from: accountState.address
@@ -59,6 +69,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
           name: 'Play',
           Icon: SportsEsportsIcon,
           isCallData: false,
+          callData: [],
           call: async (callData: any) => {
             await dragon.methods.play().send({
               from: accountState.address
@@ -73,6 +84,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
           name: 'Propose Breed',
           Icon: FavoriteIcon,
           isCallData: true,
+          callData: ['address'],
           call: async (callData: any) => {
             await dragon.methods.proposeBreed(callData.address, callData.name).send({
               from: accountState.address
@@ -87,6 +99,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
           name: 'Accept Breed',
           Icon: ChildCareIcon,
           isCallData: true,
+          callData: ['address', 'name'],
           call: async (callData: any) => {
             await dragon.methods.breed(callData.address, callData.name).send({
               from: accountState.address
@@ -101,6 +114,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
           name: 'Attack',
           Icon: Whatshot,
           isCallData: true,
+          callData: ['address'],
           call: async (callData: any) => {
             await dragon.methods.attack(callData.address).send({
               from: accountState.address
