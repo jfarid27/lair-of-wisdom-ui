@@ -16,7 +16,7 @@ import BN from "bn.js";
  * @param {*} dispatch
  */
 async function updateDragonState(accountState: any, dispatch: any) {
-  const { contracts } = accountState;
+  const { contracts, resetContracts } = accountState;
   try {
     const dragons = await Promise.all(contracts.Dragons.map(async (dragon: any) => {
       const name = await dragon.methods.name().call();
@@ -36,35 +36,77 @@ async function updateDragonState(accountState: any, dispatch: any) {
         {
           name: 'Sleep',
           Icon: Hotel,
+          isCallData: false,
+          call: async (callData: any) => {
+            await dragon.methods.sleep().send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
         },
         {
           name: 'Clean',
-          Icon: BathtubIcon
+          Icon: BathtubIcon,
+          isCallData: false,
+          call: async (callData: any) => {
+            await dragon.methods.clean().send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
         },
         {
           name: 'Play',
-          Icon: SportsEsportsIcon
+          Icon: SportsEsportsIcon,
+          isCallData: false,
+          call: async (callData: any) => {
+            await dragon.methods.play().send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
         }
       ];
 
       if (canProposeBreed) {
         availableActions.push({
           name: 'Propose Breed',
-          Icon: FavoriteIcon
+          Icon: FavoriteIcon,
+          isCallData: true,
+          call: async (callData: any) => {
+            await dragon.methods.proposeBreed(callData.address, callData.name).send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
         })
       }
 
       if (canAcceptBreed) {
         availableActions.push({
           name: 'Accept Breed',
-          Icon: ChildCareIcon
+          Icon: ChildCareIcon,
+          isCallData: true,
+          call: async (callData: any) => {
+            await dragon.methods.breed(callData.address, callData.name).send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
         })
       }
 
       if (canAttack) {
         availableActions.push({
           name: 'Attack',
-          Icon: Whatshot
+          Icon: Whatshot,
+          isCallData: true,
+          call: async (callData: any) => {
+            await dragon.methods.attack(callData.address).send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
         })
       }
 

@@ -20,6 +20,7 @@ export const Login = async (state, updateAppState) => {
         updateAppState((st) => {
           state.address = accounts[0];
           st.web3 = web3;
+          st.web3.eth.defaultAccount = accounts[0];
           st.wallet = wallet;
           return { ...st };
         });
@@ -55,9 +56,16 @@ export default function Account({ children }) {
   useEffect(() => {
     if (accountState.contracts) return;
     setupContracts(accountState, dispatch);
-  }, [accountState, accountState.loggedIn, accountState.web3])
+  }, [accountState, accountState.loggedIn, accountState.web3]);
 
-  return <AccountContext.Provider value={ { accountState, dispatch, Login } }>
+  const resetContracts = () => {
+    dispatch(st => {
+      delete st.contracts;
+      return { ...st };
+    })
+  }
+
+  return <AccountContext.Provider value={ { accountState, dispatch, Login, resetContracts } }>
     { children }
   </AccountContext.Provider>;
 }
