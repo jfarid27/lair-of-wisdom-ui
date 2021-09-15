@@ -24,6 +24,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
       const health = await dragon.methods.health().call();
       const attackCooldown = await dragon.methods.attackCooldown().call();
       const playerTrust = await dragon.methods.trust(accountState.address).call();
+      const healthRegeneration = await dragon.methods.healthRegeneration().call();
+      const damage = await dragon.methods.damage().call();
       const canDragonAttack = await dragon.methods.canAttack().call();
 
       const canAttack = canDragonAttack && (new BN(playerTrust)).gte(new BN('4'));
@@ -32,36 +34,36 @@ async function updateDragonState(accountState: any, dispatch: any) {
 
       const availableActions = [
         {
-          name: 'sleep',
-          Icon: Hotel
+          name: 'Sleep',
+          Icon: Hotel,
         },
         {
-          name: 'clean',
+          name: 'Clean',
           Icon: BathtubIcon
         },
         {
-          name: 'play',
+          name: 'Play',
           Icon: SportsEsportsIcon
         }
       ];
 
       if (canProposeBreed) {
         availableActions.push({
-          name: 'propose-breed',
+          name: 'Propose Breed',
           Icon: FavoriteIcon
         })
       }
 
       if (canAcceptBreed) {
         availableActions.push({
-          name: 'accept-breed',
+          name: 'Accept Breed',
           Icon: ChildCareIcon
         })
       }
 
       if (canAttack) {
         availableActions.push({
-          name: 'attack',
+          name: 'Attack',
           Icon: Whatshot
         })
       }
@@ -72,7 +74,9 @@ async function updateDragonState(accountState: any, dispatch: any) {
         health,
         maxHealth,
         attackCooldown,
+        healthRegeneration,
         playerTrust,
+        damage,
         availableActions: availableActions.reverse()
       };
     }));
