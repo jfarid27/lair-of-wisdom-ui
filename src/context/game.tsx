@@ -1,6 +1,14 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { AccountContext } from './account';
-import BN from 'bn.js';
+
+
+import Whatshot from '@material-ui/icons/Whatshot';
+import Hotel from '@material-ui/icons/Hotel';
+import BathtubIcon from '@material-ui/icons/Bathtub';
+import ChildCareIcon from '@material-ui/icons/ChildCare';
+import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import BN from "bn.js";
 
 /**
  * Updates the dragons game state and data using given contracts.
@@ -8,7 +16,7 @@ import BN from 'bn.js';
  * @param {*} dispatch
  */
 async function updateDragonState(accountState: any, dispatch: any) {
-  const { contracts, web3 } = accountState;
+  const { contracts } = accountState;
   try {
     const dragons = await Promise.all(contracts.Dragons.map(async (dragon: any) => {
       const name = await dragon.methods.name().call();
@@ -16,8 +24,47 @@ async function updateDragonState(accountState: any, dispatch: any) {
       const health = await dragon.methods.health().call();
       const attackCooldown = await dragon.methods.attackCooldown().call();
       const playerTrust = await dragon.methods.trust(accountState.address).call();
-      const canAttack = await dragon.methods.canAttack().call();
-      const canBreed = await dragon.methods.canBreed().call();
+      const canDragonAttack = await dragon.methods.canAttack().call();
+
+      const canAttack = canDragonAttack && (new BN(playerTrust)).gte(new BN('4'));
+      const canProposeBreed = (new BN(playerTrust)).gte(new BN('10'));
+      const canAcceptBreed = (new BN(playerTrust)).gte(new BN('10'));
+
+      const availableActions = [
+        {
+          name: 'sleep',
+          Icon: Hotel
+        },
+        {
+          name: 'clean',
+          Icon: BathtubIcon
+        },
+        {
+          name: 'play',
+          Icon: SportsEsportsIcon
+        }
+      ];
+
+      if (canProposeBreed) {
+        availableActions.push({
+          name: 'propose-breed',
+          Icon: FavoriteIcon
+        })
+      }
+
+      if (canAcceptBreed) {
+        availableActions.push({
+          name: 'accept-breed',
+          Icon: ChildCareIcon
+        })
+      }
+
+      if (canAttack) {
+        availableActions.push({
+          name: 'attack',
+          Icon: Whatshot
+        })
+      }
 
       return {
         address: dragon.options.address,
@@ -26,12 +73,12 @@ async function updateDragonState(accountState: any, dispatch: any) {
         maxHealth,
         attackCooldown,
         playerTrust,
-        canAttack,
-        canBreed
+        availableActions: availableActions.reverse()
       };
     }));
     dispatch((state: any) => {
       state.dragons = dragons;
+      state.loaded = true;
       return { ...state };
     });
   } catch (err) {
@@ -53,11 +100,13 @@ async function updateGameState(accountState: any, dispatch: any) {
  * Interface for the game state.
  */
 interface GameState {
-  dragons: [any?]
+  dragons: [any?],
+  loaded: boolean
 }
 
 const defaultGameState: GameState = {
-  dragons: []
+  dragons: [],
+  loaded: false
 };
 
 /**

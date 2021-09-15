@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Container, Grid, Paper } from '@material-ui/core';
+import React from 'react';
+import { Grid, Paper } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -31,7 +31,11 @@ export function DragonCard({ dragon } : DragonCardProps) {
       <Blockies seed={dragon.address} />
       <h3>{dragon.name}</h3>
       <h5>Trust: {dragon.playerTrust}</h5>
-      
+      <Grid container>
+        { dragon.availableActions.map((action: any) => (
+          <Grid item xs={3} key={action.name}><action.Icon /></Grid>
+        ))}
+      </Grid>
       <Table>
         <TableBody>
           <TableRow>
@@ -45,10 +49,6 @@ export function DragonCard({ dragon } : DragonCardProps) {
           <TableRow>
             <TableCell><p>Attack Cooldown</p></TableCell>
             <TableCell>{dragon.attackCooldown}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell><p>Your Trust</p></TableCell>
-            <TableCell>{dragon.playerTrust}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
