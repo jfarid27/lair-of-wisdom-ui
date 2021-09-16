@@ -3,13 +3,21 @@ import Onboard from 'bnc-onboard';
 import Web3 from 'web3';
 import setupContracts from "../actions/setupContracts";
 
+interface AccountState {
+  address?: string,
+  web3?: any,
+  wallet?: any,
+  loggedIn?: boolean,
+  contracts?: any
+}
+
 /**
  * Makes an async call to the Onboard modal to setup the user account.
  * @param {} state State object to read from.
  * @param {*} updateAppState Dispatch callback to update the state.
  * @async
  */
-export const Login = async (state, updateAppState) => {
+export const Login = async (state: AccountState, updateAppState: React.Dispatch<React.SetStateAction<AccountState>>) => {
   const onboard = Onboard({
     networkId: 250,
     networkName: "Fantom Opera",
@@ -41,25 +49,35 @@ export const Login = async (state, updateAppState) => {
   });
 }
 
+interface AccountContextInterface {
+  accountState: AccountState,
+  dispatch?: any,
+  Login: any,
+  resetContracts?: any
+}
+
 /**
  * React Context Object for web3 login and account information.
  */
-export const AccountContext = createContext({});
+export const AccountContext = createContext<AccountContextInterface>({
+  accountState: {},
+  Login
+});
 
 /**
  * Component mixer for the Account Context.
  * @param {*} param0 
  * @returns ReactComponent
  */
-export default function Account({ children }) {
-  const [accountState, dispatch] = useState({});
+const Account: React.FC = ({ children }: any) => {
+  const [accountState, dispatch] = useState<AccountState>({});
   useEffect(() => {
     if (accountState.contracts) return;
     setupContracts(accountState, dispatch);
   }, [accountState, accountState.loggedIn, accountState.web3]);
 
   const resetContracts = () => {
-    dispatch(st => {
+    dispatch((st: AccountState) => {
       delete st.contracts;
       return { ...st };
     })
@@ -69,3 +87,5 @@ export default function Account({ children }) {
     { children }
   </AccountContext.Provider>;
 }
+
+export default Account

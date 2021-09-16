@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import { AccountContext } from './account';
+import { useState, useEffect, useContext } from "react";
+import { AccountContext } from '../context/account';
 
 
 import Whatshot from '@material-ui/icons/Whatshot';
@@ -16,7 +16,10 @@ const NEEDS_THRESHOLD = 5;
 const BREED_COOLDOWN_INIT = 12 * 3600;
 const UPGRADE_COOLDOWN = 3600;
 
-export enum ActionName {
+/**
+ * Enumerates the available action names for Dragons.
+ */
+export enum DragonActionName {
   Attack = "Attack",
   Sleep = "Sleep",
   Feed = "Feed",
@@ -27,8 +30,11 @@ export enum ActionName {
   AcceptBreed = "Accept Breed"
 };
 
+/**
+ * Holds specific data and calls to execute an entities available action.
+ */
 interface AvailableAction {
-  name: ActionName,
+  name: DragonActionName,
   Icon: any,
   disabled?: boolean,
   isCallData: boolean,
@@ -36,6 +42,9 @@ interface AvailableAction {
   call: (callData: any) => Promise<void>
 }
 
+/**
+ * Hold data about a specific instance of a dragon.
+ */
 export interface DragonData {
     address: string,
     name: string,
@@ -56,7 +65,7 @@ export interface DragonData {
     availableActions: [AvailableAction]
 }
 
-export type DragonsGameState = [DragonData?];
+export type DragonsGameState = Array<DragonData>;
 
 
 
@@ -117,9 +126,12 @@ async function updateDragonState(accountState: any, dispatch: any) {
       const canProposeBreed = (new BN(playerTrust)).gte(new BN('10'));
       const canAcceptBreed = canDragonBreed && (new BN(playerTrust)).gte(new BN('10'));
 
-      const availableActions: Record<ActionName, AvailableAction> = {
-        [ActionName.Attack]: {
-          name: ActionName.Attack,
+      /**
+       * List of availale actions for an instantiated Dragon.
+       */
+      const availableActions: Record<DragonActionName, AvailableAction> = {
+        [DragonActionName.Attack]: {
+          name: DragonActionName.Attack,
           Icon: Whatshot,
           disabled: !(canAttack),
           isCallData: true,
@@ -131,8 +143,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        [ActionName.Feed]: {
-          name: ActionName.Feed,
+        [DragonActionName.Feed]: {
+          name: DragonActionName.Feed,
           Icon: Fastfood,
           disabled: !(getHunger > NEEDS_THRESHOLD),
           isCallData: false,
@@ -144,8 +156,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        [ActionName.AcceptBreed]: {
-          name: ActionName.AcceptBreed,
+        [DragonActionName.AcceptBreed]: {
+          name: DragonActionName.AcceptBreed,
           Icon: ChildCareIcon,
           isCallData: true,
           disabled: !canAcceptBreed,
@@ -157,8 +169,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        [ActionName.Sleep]: {
-          name: ActionName.Sleep,
+        [DragonActionName.Sleep]: {
+          name: DragonActionName.Sleep,
           Icon: Hotel,
           isCallData: false,
           disabled: !(getSleepiness > NEEDS_THRESHOLD),
@@ -170,8 +182,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
       },
-      [ActionName.Clean]: {
-          name: ActionName.Clean,
+      [DragonActionName.Clean]: {
+          name: DragonActionName.Clean,
           Icon: BathtubIcon,
           isCallData: false,
           callData: [],
@@ -183,8 +195,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        [ActionName.Play]: {
-          name: ActionName.Play,
+        [DragonActionName.Play]: {
+          name: DragonActionName.Play,
           Icon: SportsEsportsIcon,
           disabled: !(getBoredom > NEEDS_THRESHOLD),
           isCallData: false,
@@ -196,8 +208,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        [ActionName.Heal]: {
-          name: ActionName.Heal,
+        [DragonActionName.Heal]: {
+          name: DragonActionName.Heal,
           Icon: Healing,
           disabled: !(maxHealth - health >= healthRegeneration && playerTrust >= 1),
           isCallData: false,
@@ -209,8 +221,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        [ActionName.ProposeBreed]: {
-          name: ActionName.ProposeBreed,
+        [DragonActionName.ProposeBreed]: {
+          name: DragonActionName.ProposeBreed,
           Icon: FavoriteIcon,
           isCallData: true,
           disabled: !canProposeBreed,
@@ -253,9 +265,13 @@ async function updateDragonState(accountState: any, dispatch: any) {
   }
 }
 
-
+/**
+ * Hook to expose instantiated dragon data. Only available if account state has been instantiated.
+ * @see AccountContext
+ * @name Dragon
+ * @returns Array of instantiated Dragons.
+ */
 export const useDragons = () => {
-
   const { accountState } = useContext(AccountContext);
   const [dragons, dispatch] = useState<DragonsGameState>([]);
   useEffect(() => {

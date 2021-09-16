@@ -1,11 +1,11 @@
 import React, { createContext } from "react";
-import { DragonGameState, useDragons } from './dragons';
+import { DragonsGameState, useDragons } from '../hooks/dragons';
 
 /**
  * Interface for the game state.
  */
 interface GameState {
-  dragons?: DragonGameState,
+  dragons?: DragonsGameState,
 }
 
 /**
