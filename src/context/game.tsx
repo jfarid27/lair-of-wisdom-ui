@@ -84,6 +84,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
           Icon: Fastfood,
           disabled: !(getHunger > NEEDS_THRESHOLD),
           isCallData: false,
+          callData: [],
           call: async (callData: any) => {
             await dragon.methods.feed().send({
               from: accountState.address
@@ -146,7 +147,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
           name: 'Heal',
           Icon: Healing,
           disabled: !(maxHealth - health >= healthRegeneration && playerTrust >= 1),
-          isCallData: true,
+          isCallData: false,
+          callData: [],
           call: async (callData: any) => {
             await dragon.methods.heal().send({
               from: accountState.address
