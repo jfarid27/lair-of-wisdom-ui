@@ -108,6 +108,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
           name: 'Sleep',
           Icon: Hotel,
           isCallData: false,
+          disabled: !(getSleepiness > NEEDS_THRESHOLD),
           callData: [],
           call: async (callData: any) => {
             await dragon.methods.sleep().send({
