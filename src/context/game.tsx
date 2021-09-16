@@ -11,7 +11,6 @@ import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import Healing from '@material-ui/icons/Healing';
 import BN from "bn.js";
-import { truncateSync } from "fs";
 
 const NEEDS_THRESHOLD = 5;
 
@@ -69,7 +68,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
         {
           name: 'Attack',
           Icon: Whatshot,
-          disabled: !(getSleepiness > NEEDS_THRESHOLD),
+          disabled: !(canAttack),
           isCallData: true,
           callData: ['address'],
           call: async (callData: any) => {
