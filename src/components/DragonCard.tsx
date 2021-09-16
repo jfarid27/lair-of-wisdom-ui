@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 import Blockies from 'react-blockies';
 import { useState } from 'react';
-import Text from './../constants/text.json';
 
 const useDragonActionStyles = makeStyles((theme) => ({
   modal: {
@@ -39,7 +38,7 @@ const useCardStyles = makeStyles((theme) => ({
   root: {
     padding: '10px',
     margin: '10px',
-    height: '1255px'
+    height: 'auto'
   },
 }));
 
@@ -101,10 +100,6 @@ interface CallData {
   }
 }
 
-interface DragonLore {
-  [k: string]: string
-}
-
 /**
  * Component to showcase dragon data and drilldown.
  * @param param0 React props.
@@ -126,8 +121,6 @@ export function DragonCard({ dragon } : DragonCardProps) {
       return callDatas;
     });
   }, [dragon, dragon.availableActions]);
-
-  const dragonLore: DragonLore = Text.ENG.lore.dragons;
 
   return (<Grid item xs={3}>
     <Paper variant="outlined" className={classesCard.root}>
@@ -164,7 +157,6 @@ export function DragonCard({ dragon } : DragonCardProps) {
           </TableRow>
         </TableBody>
       </Table>
-      <em>{ dragonLore[dragon.address] || dragonLore['default'] }</em>
     </Paper>
   </Grid>)
 }
