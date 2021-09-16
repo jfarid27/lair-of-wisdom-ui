@@ -13,7 +13,16 @@ import Healing from '@material-ui/icons/Healing';
 import BN from "bn.js";
 import { truncateSync } from "fs";
 
-const NEEDS_THRESHOLD = 5
+const NEEDS_THRESHOLD = 5;
+
+interface AvailableAction {
+  name: string,
+  Icon: any,
+  disabled?: boolean,
+  isCallData: boolean,
+  callData: Array<String>,
+  call: (callData: any) => Promise<void>
+}
 
 /**
  * Updates the dragons game state and data using given contracts.
@@ -56,12 +65,24 @@ async function updateDragonState(accountState: any, dispatch: any) {
       const canProposeBreed = (new BN(playerTrust)).gte(new BN('10'));
       const canAcceptBreed = (new BN(playerTrust)).gte(new BN('10'));
 
-      const availableActions = []
-
-      if(getHunger > NEEDS_THRESHOLD) {
-        availableActions.push({
+      const availableActions: Array<AvailableAction> = [
+        {
+          name: 'Attack',
+          Icon: Whatshot,
+          disabled: !(getSleepiness > NEEDS_THRESHOLD),
+          isCallData: true,
+          callData: ['address'],
+          call: async (callData: any) => {
+            await dragon.methods.attack(callData.address).send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
+        },
+        {
           name: 'Feed',
           Icon: Fastfood,
+          disabled: !(getHunger > NEEDS_THRESHOLD),
           isCallData: false,
           call: async (callData: any) => {
             await dragon.methods.feed().send({
@@ -69,55 +90,62 @@ async function updateDragonState(accountState: any, dispatch: any) {
             })
             resetContracts();
           }
-        })
-      }
-
-      if(getSleepiness > NEEDS_THRESHOLD) {
-        availableActions.push({
+        },
+        {
+          name: 'Accept Breed',
+          Icon: ChildCareIcon,
+          isCallData: true,
+          disabled: !canAcceptBreed,
+          callData: ['address', 'name'],
+          call: async (callData: any) => {
+            await dragon.methods.breed(callData.address, callData.name).send({
+              from: accountState.address
+            })
+            resetContracts();
+          }
+        },
+        {
           name: 'Sleep',
           Icon: Hotel,
           isCallData: false,
+          callData: [],
           call: async (callData: any) => {
             await dragon.methods.sleep().send({
               from: accountState.address
             })
             resetContracts();
           }
-        })
-      }
-
-      if(getUncleanliness > NEEDS_THRESHOLD) {
-        availableActions.push({
+      },
+      {
           name: 'Clean',
           Icon: BathtubIcon,
           isCallData: false,
+          callData: [],
+          disabled: !(getUncleanliness > NEEDS_THRESHOLD),
           call: async (callData: any) => {
             await dragon.methods.clean().send({
               from: accountState.address
             })
             resetContracts();
           }
-        })
-      }
-
-      if(getBoredom > NEEDS_THRESHOLD) {
-        availableActions.push({
+        },
+        {
           name: 'Play',
           Icon: SportsEsportsIcon,
+          disabled: !(getBoredom > NEEDS_THRESHOLD),
           isCallData: false,
+          callData: [],
           call: async (callData: any) => {
             await dragon.methods.play().send({
               from: accountState.address
             })
             resetContracts();
           }
-        })
-      }
-
-      if(maxHealth - health >= healthRegeneration && playerTrust >= 1) {
-        availableActions.push({
+        },
+        {
           name: 'Heal',
           Icon: Healing,
+          disabled: !(maxHealth - health >= healthRegeneration && playerTrust >= 1),
           isCallData: true,
           call: async (callData: any) => {
             await dragon.methods.heal().send({
@@ -125,50 +153,21 @@ async function updateDragonState(accountState: any, dispatch: any) {
             })
             resetContracts();
           }
-        })
-      }
-
-      if (canProposeBreed) {
-        availableActions.push({
+        },
+        {
           name: 'Propose Breed',
           Icon: FavoriteIcon,
           isCallData: true,
+          disabled: !canProposeBreed,
+          callData: ['address'],
           call: async (callData: any) => {
             await dragon.methods.proposeBreed(callData.address, callData.name).send({
               from: accountState.address
             })
             resetContracts();
           }
-        })
-      }
-
-      if (canAcceptBreed) {
-        availableActions.push({
-          name: 'Accept Breed',
-          Icon: ChildCareIcon,
-          isCallData: true,
-          call: async (callData: any) => {
-            await dragon.methods.breed(callData.address, callData.name).send({
-              from: accountState.address
-            })
-            resetContracts();
-          }
-        })
-      }
-
-      if (canAttack) {
-        availableActions.push({
-          name: 'Attack',
-          Icon: Whatshot,
-          isCallData: true,
-          call: async (callData: any) => {
-            await dragon.methods.attack(callData.address).send({
-              from: accountState.address
-            })
-            resetContracts();
-          }
-        })
-      }
+        }
+      ];
 
       return {
         address: dragon.options.address,

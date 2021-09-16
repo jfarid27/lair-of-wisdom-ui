@@ -1,6 +1,10 @@
 import { useContext } from 'react';
 import { Button } from '@material-ui/core';
 import { AccountContext } from '../context/account';
+import Blockies from 'react-blockies';
+import { settings } from './../constants/contracts';
+
+const LairAddress = settings.fantom.Lair.address;
 
 /**
  * Login Component showing the button interaction for users to login.
@@ -11,6 +15,7 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <h1>Lair of Wisdom</h1>
+      <Blockies seed={LairAddress} size={30} />
       <p>An Fantom based MMO RPG. Please <a rel="noreferrer" href="https://docs.fantom.foundation/tutorials/set-up-metamask" target="_blank">setup Fantom</a> and login.</p>
       <Button onClick={() => Login(accountState, dispatch)} variant="outlined" size="large">Login</Button>
 
