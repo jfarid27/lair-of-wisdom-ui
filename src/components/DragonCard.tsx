@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Grid, Paper } from '@material-ui/core';
+import { Grid, Paper, GridSize } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -34,11 +34,18 @@ const useActionStyles = makeStyles((theme) => ({
   
 }));
 
+const useNeedsStyles = makeStyles((theme) => ({
+  root: {
+    marginBottom: '20px'
+  },
+  
+}));
+
 const useCardStyles = makeStyles((theme) => ({
   root: {
     padding: '10px',
     margin: '10px',
-    height: 'auto'
+    height: 'auto',
   },
 }));
 
@@ -48,12 +55,14 @@ interface DragonCardProps {
 
 interface DragonActionProps {
   action: any,
+  size: GridSize,
+  availableIn: any,
   callData: any,
   classes: any,
   updateCallData: any
 }
 
-function DragonAction ({ action, callData, classes, updateCallData}: DragonActionProps) {
+function DragonAction ({ action, size, availableIn, callData, classes, updateCallData}: DragonActionProps) {
 
   const [open, handleClose] = useState(false);
   const actionClasses = useDragonActionStyles();
@@ -65,12 +74,15 @@ function DragonAction ({ action, callData, classes, updateCallData}: DragonActio
     })
   }
 
-  return <Grid item xs={12}>
+  return <Grid item xs={size}>
     <Grid container>
       <Grid item xs={12}>
         <Button fullWidth variant="outlined" onClick={() => handleClose(true)} className={actionClasses.button} disabled={action.disabled}>
           <action.Icon />
-          <p>{action.name}</p>
+          <p>&nbsp;{action.name}</p>
+          {action.disabled && availableIn > 0 && (
+            <p>&nbsp;~ {availableIn} secs</p>
+          )}
         </Button>
       </Grid>
     </Grid>
@@ -108,12 +120,14 @@ interface CallData {
 export function DragonCard({ dragon } : DragonCardProps) {
   const classesCard = useCardStyles();
   const classesGrid = useActionStyles();
+  const classesNeedsGrid = useNeedsStyles();
   const [callData, updateCallData] = useState<CallData>({});
 
   useEffect(() => {
     updateCallData(() => {
       const callDatas: any = {};
-      for (const action of dragon.availableActions) {
+      for (const actionName in dragon.availableActions) {
+        const action = dragon.availableActions[actionName]
         if (action.isCallData) {
           callDatas[action.name] = {};
         }
@@ -128,20 +142,15 @@ export function DragonCard({ dragon } : DragonCardProps) {
       <h3>{dragon.name}</h3>
       <h5>Trust: {dragon.playerTrust}</h5>
       
-      <Grid container>
-        { dragon.availableActions.map((action: any) => (
-          <DragonAction key={action.name} action={action} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
-        ))}
-      </Grid>
       <Table>
         <TableBody>
           <TableRow>
             <TableCell><p>Health</p></TableCell>
-            <TableCell>{dragon.health}</TableCell>
+            <TableCell><p>{dragon.health} / {dragon.maxHealth} ({dragon.healthPercent.toString()}%)</p></TableCell>
           </TableRow>
           <TableRow>
-            <TableCell><p>Max Health</p></TableCell>
-            <TableCell>{dragon.maxHealth}</TableCell>
+            <TableCell><p>Health Regen</p></TableCell>
+            <TableCell>{dragon.healthRegeneration}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell><p>Damage</p></TableCell>
@@ -151,12 +160,28 @@ export function DragonCard({ dragon } : DragonCardProps) {
             <TableCell><p>Attack Cooldown</p></TableCell>
             <TableCell>{dragon.attackCooldown}</TableCell>
           </TableRow>
-          <TableRow>
-            <TableCell><p>Health Regen.</p></TableCell>
-            <TableCell>{dragon.healthRegeneration}</TableCell>
-          </TableRow>
         </TableBody>
       </Table>
+
+      <Grid container style={{marginTop: "20px", alignItems: "center"}}>
+        <Grid key={dragon.availableActions.feed.name+'-score'} item xs={6} classes={classesNeedsGrid} > Hunger : {dragon.getHunger}</Grid>
+        <DragonAction key={dragon.availableActions.feed.name} action={dragon.availableActions.feed} size={6} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <Grid key={dragon.availableActions.sleep.name+'-score'} item xs={6} classes={classesNeedsGrid} > Sleepiness : {dragon.getSleepiness}</Grid>
+        <DragonAction key={dragon.availableActions.sleep.name} action={dragon.availableActions.sleep} size={6} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <Grid key={dragon.availableActions.clean.name+'-score'} item xs={6} classes={classesNeedsGrid} > Uncleanliness : {dragon.getUncleanliness}</Grid>
+        <DragonAction key={dragon.availableActions.clean.name} action={dragon.availableActions.clean} size={6} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <Grid key={dragon.availableActions.play.name+'-score'} item xs={6} classes={classesNeedsGrid} > Boredom : {dragon.getBoredom}</Grid>
+        <DragonAction key={dragon.availableActions.play.name} action={dragon.availableActions.play} size={6} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        
+        <DragonAction key={dragon.availableActions.heal.name} action={dragon.availableActions.heal} size={12} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <DragonAction key={dragon.availableActions.attack.name} action={dragon.availableActions.attack} size={12} availableIn={dragon.realSecondsUntilAttack.toNumber()} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <DragonAction key={dragon.availableActions.proposeBreed.name} action={dragon.availableActions.proposeBreed} size={12} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <DragonAction key={dragon.availableActions.acceptBreed.name} action={dragon.availableActions.acceptBreed} size={12} availableIn={dragon.realSecondsUntilBreed.toNumber()} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+      </Grid>
     </Paper>
   </Grid>)
+
+  /*{ dragon.availableActions.map((action: any) => (
+          <DragonAction key={action.name} action={action} size={12} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        ))}*/
 }

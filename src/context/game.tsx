@@ -13,6 +13,10 @@ import Healing from '@material-ui/icons/Healing';
 import BN from "bn.js";
 
 const NEEDS_THRESHOLD = 5;
+const BREED_COOLDOWN_INIT = 12 * 3600;
+const UPGRADE_COOLDOWN = 3600;
+
+type ActionName = "attack" | "sleep" | "feed" | "clean" | "play" | "heal" | "proposeBreed" | "acceptBreed";
 
 interface AvailableAction {
   name: string,
@@ -41,10 +45,15 @@ async function updateDragonState(accountState: any, dispatch: any) {
         healthRegeneration,
         damage,
         canDragonAttack,
+        canDragonBreed,
         getHunger,
         getSleepiness,
         getUncleanliness,
-        getBoredom
+        getBoredom,
+        breedCount,
+        secondsUntilBreed,
+        secondsUntilUpgrade,
+        secondsUntilAttack
       ] = await Promise.all([
         dragon.methods.name().call(),
         dragon.methods.maxHealth().call(),
@@ -54,18 +63,29 @@ async function updateDragonState(accountState: any, dispatch: any) {
         dragon.methods.healthRegeneration().call(),
         dragon.methods.damage().call(),
         dragon.methods.canAttack().call(),
+        dragon.methods.canBreed().call(),
         dragon.methods.getHunger().call(),
         dragon.methods.getSleepiness().call(),
         dragon.methods.getUncleanliness().call(),
-        dragon.methods.getBoredom().call()
+        dragon.methods.getBoredom().call(),
+        dragon.methods.breedCount().call(),
+        dragon.methods.secondsUntilBreed().call(),
+        dragon.methods.secondsUntilUpgrade().call(),
+        dragon.methods.secondsUntilAttack().call()
       ])
+
+      const healthPercent = new BN(health).mul(new BN('10000')).div(new BN(maxHealth)).div(new BN('100'));
+
+      const realSecondsUntilBreed = Number(secondsUntilBreed) > 0 ? new BN(2 *  (BREED_COOLDOWN_INIT * (2 ** (Number(breedCount) + 1))) - Number(secondsUntilBreed)): new BN('0');
+      const realSecondsUntilAttack = Number(secondsUntilAttack) > 0 ? new BN(attackCooldown).mul(new BN('2')).sub(new BN(secondsUntilAttack)): new BN('0');
+      const realSecondsUntilUpgrade = Number(secondsUntilUpgrade) > 0 ? new BN((2 * UPGRADE_COOLDOWN) - Number(secondsUntilUpgrade)): new BN('0');
 
       const canAttack = canDragonAttack && (new BN(playerTrust)).gte(new BN('4'));
       const canProposeBreed = (new BN(playerTrust)).gte(new BN('10'));
-      const canAcceptBreed = (new BN(playerTrust)).gte(new BN('10'));
+      const canAcceptBreed = canDragonBreed && (new BN(playerTrust)).gte(new BN('10'));
 
-      const availableActions: Array<AvailableAction> = [
-        {
+      const availableActions: Record<ActionName, AvailableAction> = {
+        attack: {
           name: 'Attack',
           Icon: Whatshot,
           disabled: !(canAttack),
@@ -78,7 +98,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        {
+        feed: {
           name: 'Feed',
           Icon: Fastfood,
           disabled: !(getHunger > NEEDS_THRESHOLD),
@@ -91,7 +111,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        {
+        acceptBreed: {
           name: 'Accept Breed',
           Icon: ChildCareIcon,
           isCallData: true,
@@ -104,7 +124,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        {
+        sleep: {
           name: 'Sleep',
           Icon: Hotel,
           isCallData: false,
@@ -117,7 +137,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
       },
-      {
+      clean: {
           name: 'Clean',
           Icon: BathtubIcon,
           isCallData: false,
@@ -130,7 +150,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        {
+        play: {
           name: 'Play',
           Icon: SportsEsportsIcon,
           disabled: !(getBoredom > NEEDS_THRESHOLD),
@@ -143,7 +163,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        {
+        heal: {
           name: 'Heal',
           Icon: Healing,
           disabled: !(maxHealth - health >= healthRegeneration && playerTrust >= 1),
@@ -156,7 +176,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        {
+        proposeBreed: {
           name: 'Propose Breed',
           Icon: FavoriteIcon,
           isCallData: true,
@@ -169,18 +189,26 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         }
-      ];
+      };
 
       return {
         address: dragon.options.address,
         name,
         health,
         maxHealth,
+        healthPercent,
         attackCooldown,
         healthRegeneration,
         playerTrust,
         damage,
-        availableActions: availableActions.reverse()
+        getHunger,
+        getSleepiness,
+        getUncleanliness,
+        getBoredom,
+        realSecondsUntilBreed,
+        realSecondsUntilAttack,
+        realSecondsUntilUpgrade,
+        availableActions: availableActions
       };
     }));
     dispatch((state: any) => {
