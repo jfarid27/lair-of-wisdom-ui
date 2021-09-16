@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 import Blockies from 'react-blockies';
 import { useState } from 'react';
+import Text from './../constants/text.json';
 
 const useDragonActionStyles = makeStyles((theme) => ({
   modal: {
@@ -22,20 +23,23 @@ const useDragonActionStyles = makeStyles((theme) => ({
     left: '$50%',
     transform: 'translate(100%, 100%)'
   },
+  button: {
+    marginBottom: '20px'
+  }
 }));
 
 const useActionStyles = makeStyles((theme) => ({
   root: {
-    padding: '10px',
-    margin: '10px',
-    cursor: 'pointer'
+    marginBottom: '20px'
   },
+  
 }));
 
 const useCardStyles = makeStyles((theme) => ({
   root: {
     padding: '10px',
-    margin: '10px'
+    margin: '10px',
+    height: '1255px'
   },
 }));
 
@@ -62,11 +66,15 @@ function DragonAction ({ action, callData, classes, updateCallData}: DragonActio
     })
   }
 
-  return <Grid item xs={4} key={action.name}>
-    <Paper variant="outlined" onClick={() => handleClose(true)} className={classes.root}>
-      <action.Icon />
-      <p>{action.name}</p>
-    </Paper>
+  return <Grid item xs={12}>
+    <Grid container>
+      <Grid item xs={12}>
+        <Button fullWidth variant="outlined" onClick={() => handleClose(true)} className={actionClasses.button} disabled={action.disabled}>
+          <action.Icon />
+          <p>{action.name}</p>
+        </Button>
+      </Grid>
+    </Grid>
     <Modal
       open={open}
       onClose={handleClose}
@@ -93,6 +101,10 @@ interface CallData {
   }
 }
 
+interface DragonLore {
+  [k: string]: string
+}
+
 /**
  * Component to showcase dragon data and drilldown.
  * @param param0 React props.
@@ -115,14 +127,17 @@ export function DragonCard({ dragon } : DragonCardProps) {
     });
   }, [dragon, dragon.availableActions]);
 
+  const dragonLore: DragonLore = Text.ENG.lore.dragons;
+
   return (<Grid item xs={3}>
     <Paper variant="outlined" className={classesCard.root}>
       <Blockies seed={dragon.address} size={30} />
       <h3>{dragon.name}</h3>
       <h5>Trust: {dragon.playerTrust}</h5>
+      
       <Grid container>
         { dragon.availableActions.map((action: any) => (
-          <DragonAction action={action} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+          <DragonAction key={action.name} action={action} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
         ))}
       </Grid>
       <Table>
@@ -149,6 +164,7 @@ export function DragonCard({ dragon } : DragonCardProps) {
           </TableRow>
         </TableBody>
       </Table>
+      <em>{ dragonLore[dragon.address] || dragonLore['default'] }</em>
     </Paper>
   </Grid>)
 }

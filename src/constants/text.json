@@ -1,0 +1,13 @@
+{
+  "ENG": {
+    "lore": {
+      "dragons": {
+        "default": "You haven't heard anything in the alehouse about this dragon. Only whispers...",
+        "0x6b121793d1cB8936BAC7135e8532BfBf3e694166": "Many years ago a man was exiled from society. Cast out, he cursed the realm for a thousand years of fiery pain. The next day, the first town was raised by Leshner, the dragon.",
+        "0xF10E6c070DEa8af8Cc5dd19bAAB732D9Ab4Ba869": "For 10 years, Leshner raised cities in the realm far and wide. Many hated the creature and sought to fight it. Rumors of another dragon came from the Land of Angels to the west. The stories say it lived in the Olden forest, and only to pure women. Or maybe it is only the pure women who return?",
+        "0x1BDC08b57143Ec6AB617F0e7a8c91Dd5beDAC329": "The sunflower sisters were first seen during the raising of the Castle of Asther. Both dragons appeared to attack the fortress, and it was said the fire burned so hot the air caught aflame. The investigators who came to the town after noticed only the fortress garden was spared, leaving only sunflowers.",
+        "0x71D29f2393ACDC2e53133CAEd09F8A596E3AFDFb": "The second sunflower sister complements her first. Much smaller and an icy blue hue, contrasting her sisters' reddish-black. Some say the two only appear during warm days after a deep freezing cold. Many have learned to say away from towns during these heat-frosts."
+      }
+    }
+  }
+}
