@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import { AccountContext } from './account';
+import { useState, useEffect, useContext } from "react";
+import { AccountContext } from '../context/account';
 
 
 import Whatshot from '@material-ui/icons/Whatshot';
@@ -16,16 +16,58 @@ const NEEDS_THRESHOLD = 5;
 const BREED_COOLDOWN_INIT = 12 * 3600;
 const UPGRADE_COOLDOWN = 3600;
 
-type ActionName = "attack" | "sleep" | "feed" | "clean" | "play" | "heal" | "proposeBreed" | "acceptBreed";
+/**
+ * Enumerates the available action names for Dragons.
+ */
+export enum DragonActionName {
+  Attack = "Attack",
+  Sleep = "Sleep",
+  Feed = "Feed",
+  Clean = "Clean",
+  Play = "Play",
+  Heal = "Heal",
+  ProposeBreed = "Propose Breed",
+  AcceptBreed = "Accept Breed"
+};
 
+/**
+ * Holds specific data and calls to execute an entities available action.
+ */
 interface AvailableAction {
-  name: string,
+  name: DragonActionName,
   Icon: any,
   disabled?: boolean,
   isCallData: boolean,
   callData: Array<String>,
   call: (callData: any) => Promise<void>
 }
+
+/**
+ * Hold data about a specific instance of a dragon.
+ */
+export interface DragonData {
+    address: string,
+    name: string,
+    health: string,
+    maxHealth : string,
+    healthPercent: string,
+    attackCooldown: string,
+    healthRegeneration: string,
+    playerTrust: string,
+    damage: string,
+    getHunger: string,
+    getSleepiness: string,
+    getUncleanliness: string,
+    getBoredom: string,
+    realSecondsUntilBreed: string,
+    realSecondsUntilAttack: string,
+    realSecondsUntilUpgrade: string,
+    availableActions: [AvailableAction]
+}
+
+export type DragonsGameState = Array<DragonData>;
+
+
 
 /**
  * Updates the dragons game state and data using given contracts.
@@ -84,9 +126,12 @@ async function updateDragonState(accountState: any, dispatch: any) {
       const canProposeBreed = (new BN(playerTrust)).gte(new BN('10'));
       const canAcceptBreed = canDragonBreed && (new BN(playerTrust)).gte(new BN('10'));
 
-      const availableActions: Record<ActionName, AvailableAction> = {
-        attack: {
-          name: 'Attack',
+      /**
+       * List of availale actions for an instantiated Dragon.
+       */
+      const availableActions: Record<DragonActionName, AvailableAction> = {
+        [DragonActionName.Attack]: {
+          name: DragonActionName.Attack,
           Icon: Whatshot,
           disabled: !(canAttack),
           isCallData: true,
@@ -98,8 +143,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        feed: {
-          name: 'Feed',
+        [DragonActionName.Feed]: {
+          name: DragonActionName.Feed,
           Icon: Fastfood,
           disabled: !(getHunger > NEEDS_THRESHOLD),
           isCallData: false,
@@ -111,8 +156,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        acceptBreed: {
-          name: 'Accept Breed',
+        [DragonActionName.AcceptBreed]: {
+          name: DragonActionName.AcceptBreed,
           Icon: ChildCareIcon,
           isCallData: true,
           disabled: !canAcceptBreed,
@@ -124,8 +169,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        sleep: {
-          name: 'Sleep',
+        [DragonActionName.Sleep]: {
+          name: DragonActionName.Sleep,
           Icon: Hotel,
           isCallData: false,
           disabled: !(getSleepiness > NEEDS_THRESHOLD),
@@ -137,8 +182,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
       },
-      clean: {
-          name: 'Clean',
+      [DragonActionName.Clean]: {
+          name: DragonActionName.Clean,
           Icon: BathtubIcon,
           isCallData: false,
           callData: [],
@@ -150,8 +195,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        play: {
-          name: 'Play',
+        [DragonActionName.Play]: {
+          name: DragonActionName.Play,
           Icon: SportsEsportsIcon,
           disabled: !(getBoredom > NEEDS_THRESHOLD),
           isCallData: false,
@@ -163,8 +208,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        heal: {
-          name: 'Heal',
+        [DragonActionName.Heal]: {
+          name: DragonActionName.Heal,
           Icon: Healing,
           disabled: !(maxHealth - health >= healthRegeneration && playerTrust >= 1),
           isCallData: false,
@@ -176,8 +221,8 @@ async function updateDragonState(accountState: any, dispatch: any) {
             resetContracts();
           }
         },
-        proposeBreed: {
-          name: 'Propose Breed',
+        [DragonActionName.ProposeBreed]: {
+          name: DragonActionName.ProposeBreed,
           Icon: FavoriteIcon,
           isCallData: true,
           disabled: !canProposeBreed,
@@ -212,9 +257,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
       };
     }));
     dispatch((state: any) => {
-      state.dragons = dragons;
-      state.loaded = true;
-      return { ...state };
+      return dragons;
     });
   } catch (err) {
     console.log(err)
@@ -223,49 +266,18 @@ async function updateDragonState(accountState: any, dispatch: any) {
 }
 
 /**
- * Updates the full game state and data using given contracts.
- * @param {*} contracts 
- * @param {*} dispatch 
+ * Hook to expose instantiated dragon data. Only available if account state has been instantiated.
+ * @see AccountContext
+ * @name useDragons
+ * @returns Array of instantiated Dragons.
  */
-async function updateGameState(accountState: any, dispatch: any) {
-  updateDragonState(accountState, dispatch);
-}
-
-/**
- * Interface for the game state.
- */
-interface GameState {
-  dragons: [any?],
-  loaded: boolean
-}
-
-const defaultGameState: GameState = {
-  dragons: [],
-  loaded: false
-};
-
-/**
- * React Context Object for game data.
- */
-export const GameContext = createContext<GameState>(defaultGameState);
-
-/**
- * Component mixer for the Game Context.
- * @param {*} param0 
- * @returns ReactComponent
- */
- const Game:React.FC<{}> = ({ children }: any) => {
-  const { accountState } : any = useContext(AccountContext);
-  const [gameState, dispatch] = useState<GameState>(defaultGameState);
-
+export const useDragons = () => {
+  const { accountState } = useContext(AccountContext);
+  const [dragons, dispatch] = useState<DragonsGameState>([]);
   useEffect(() => {
     if (!accountState.contracts) return;
-    updateGameState(accountState, dispatch);
+    updateDragonState(accountState, dispatch);
   }, [accountState, accountState.contracts]);
 
-  return <GameContext.Provider value={ gameState }>
-    { children }
-  </GameContext.Provider>;
+  return dragons;
 }
-
-export default Game
