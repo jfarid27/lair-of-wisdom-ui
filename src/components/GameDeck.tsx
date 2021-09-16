@@ -1,6 +1,5 @@
-import React, { useContext } from 'react';
 import { Grid } from '@material-ui/core';
-import { GameContext } from './../context/game';
+import useGame from '../hooks/game';
 import { DragonCard } from './DragonCard';
 
 /**
@@ -8,13 +7,13 @@ import { DragonCard } from './DragonCard';
  * @returns ReactComponent
  */
 export default function GameDeck() {
-  const GameState : any = useContext(GameContext);
-  const { dragons, loaded } = GameState;
+  const gameState = useGame();
+  const { dragons } = gameState;
   return (
     <div>
       <h3>Dragons</h3>
       {
-        loaded ? <Grid container className='game-deck'>
+        dragons ? <Grid container className='game-deck'>
           { dragons.map((dragon: any) => (
             <DragonCard dragon={dragon} key={dragon.address} />
           ))}

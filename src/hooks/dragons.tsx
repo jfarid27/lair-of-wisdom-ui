@@ -268,7 +268,7 @@ async function updateDragonState(accountState: any, dispatch: any) {
 /**
  * Hook to expose instantiated dragon data. Only available if account state has been instantiated.
  * @see AccountContext
- * @name Dragon
+ * @name useDragons
  * @returns Array of instantiated Dragons.
  */
 export const useDragons = () => {
