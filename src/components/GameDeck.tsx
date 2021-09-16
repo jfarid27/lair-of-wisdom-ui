@@ -1,5 +1,5 @@
 import { Grid } from '@material-ui/core';
-import useGame from '../hooks/game';
+import { useDragons } from '../hooks/dragons';
 import { DragonCard } from './DragonCard';
 
 /**
@@ -7,13 +7,15 @@ import { DragonCard } from './DragonCard';
  * @returns ReactComponent
  */
 export default function GameDeck() {
-  const gameState = useGame();
-  const { dragons } = gameState;
+  const dragons = useDragons();
+
+  const loaded = dragons && dragons.length > 0;
   return (
     <div>
       <h3>Dragons</h3>
       {
-        dragons ? <Grid container className='game-deck'>
+        (loaded) ? 
+        <Grid container className='game-deck'>
           { dragons.map((dragon: any) => (
             <DragonCard dragon={dragon} key={dragon.address} />
           ))}
