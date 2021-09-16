@@ -21,7 +21,7 @@ export default function LoginPage() {
 
       <p><a rel="noreferrer" href="https://nourharidy.medium.com/lair-of-wisdom-on-chain-co-op-pvp-mmo-game-guide-rules-82422209eeb5" target="_blank">Medium</a> | <a href="https://discord.gg/6cw7Edneua" target="_blank" rel="noreferrer">Discord</a></p>
       <p>Game: <a rel="noreferrer" href="https://twitter.com/NourHaridy" target="_blank">@NourHaridy</a></p>
-      <p>App: <a rel="noreferrer" href="https://twitter.com/digital_monad" target="_blank">@digital_monad</a></p>
+      <p>App: <a rel="noreferrer" href="https://github.com/jfarid27/lair-of-wisdom-ui/graphs/contributors" target="_blank">Contributors</a></p>
     </div>
   );
 }
