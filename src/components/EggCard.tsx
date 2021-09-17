@@ -1,15 +1,12 @@
 import { useEffect } from 'react';
 import { Grid, Paper, GridSize } from '@material-ui/core';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
 import { Button } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
-import TableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 import Blockies from 'react-blockies';
 import { useState } from 'react';
-import { EggsActionName } from '../hooks/eggs';
+import { EggData, EggsActionName } from '../hooks/eggs';
+import moment from 'moment';
 
 const useEggActionStyles = makeStyles((theme) => ({
   modal: {
@@ -44,7 +41,7 @@ const useCardStyles = makeStyles((theme) => ({
 }));
 
 interface EggCardProps {
-  egg: any
+  egg: EggData
 }
 
 interface EggActionProps {
@@ -99,12 +96,7 @@ function EggAction ({ action, size, availableIn, callData, classes, updateCallDa
   </Grid>
 }
 
-
-interface CallData {
-  [k: string]: {
-    [j: string]: string
-  }
-}
+type CallData = Record<EggsActionName, any>;
 
 /**
  * Component to showcase egg data and drilldown.
@@ -113,40 +105,34 @@ interface CallData {
 export function EggCard({ egg } : EggCardProps) {
   const classesCard = useCardStyles();
   const classesGrid = useActionStyles();
-  const [callData, updateCallData] = useState<CallData>({});
+  const [callData, updateCallData] = useState<CallData>({
+    [EggsActionName.GiveBirth]: {},
+    [EggsActionName.GiveTribute]: {},
+  });
 
   useEffect(() => {
     updateCallData(() => {
-      const callDatas: any = {};
-      for (const actionName in egg.availableActions) {
-        const action = egg.availableActions[actionName]
-        if (action.isCallData) {
-          callDatas[action.name] = {};
-        }
-      }
+      const callDatas = {
+        [EggsActionName.GiveBirth]: {},
+        [EggsActionName.GiveTribute]: {},
+      };
       return callDatas;
     });
   }, [egg, egg.availableActions]);
+
+  const timeUntilHatch = moment().to(moment().add(egg.secondsUntilHatched, 'seconds'));
 
   return (<Grid item xs={3}>
     <Paper variant="outlined" className={classesCard.root}>
       <Blockies seed={egg.address} size={30} />
       <h3>{egg.name}</h3>
       <h5>Tributes: {egg.numTributes}</h5>
-      
-      <Table>
-        <TableBody>
-          <TableRow>
-            <TableCell><p>Time Until Hatch</p></TableCell>
-            <TableCell><p> </p></TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <h5>Time Until Hatch: { timeUntilHatch }</h5>
 
       <Grid container style={{marginTop: "20px", alignItems: "center"}}>
 
         <EggAction key={EggsActionName.GiveTribute} action={egg.availableActions[EggsActionName.GiveTribute]} size={12} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
-        <EggAction key={EggsActionName.GiveBirth} action={egg.availableActions[EggsActionName.GiveBirth]} size={12} availableIn={egg.secondsUntilHatched} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <EggAction key={EggsActionName.GiveBirth} action={egg.availableActions[EggsActionName.GiveBirth]} size={12} availableIn={moment().to(moment().add(egg.secondsUntilHatched, 'seconds'))} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
       </Grid>
     </Paper>
   </Grid>)
