@@ -34,7 +34,7 @@ export interface EggData {
     userCanHatch: boolean,
     secondsUntilHatched: string,
     numTributes: string,
-    availableActions: [EggAvailableAction]
+    availableActions: Record<EggsActionName, EggAvailableAction>
 }
 
 export type EggsGameState = Array<EggData>;
@@ -44,10 +44,10 @@ export type EggsGameState = Array<EggData>;
  * @param {*} contracts
  * @param {*} dispatch
  */
-async function updateEggsState(accountState: any, dispatch: any) {
+async function updateEggsState(accountState: any, dispatch: React.Dispatch<React.SetStateAction<EggsGameState>>) {
   const { contracts, resetContracts } = accountState;
   try {
-    const eggs = await Promise.all(contracts.Eggs.map(async (egg: any) => {
+    const eggs: EggData[] = await Promise.all(contracts.Eggs.map(async (egg: any) => {
       const [
         name,
         isHatched,
@@ -102,9 +102,11 @@ async function updateEggsState(accountState: any, dispatch: any) {
         secondsUntilHatched,
         numTributes,
         availableActions: availableActions
-      };
+      } as EggData;
     }));
-    dispatch((state: any) => eggs);
+    dispatch(() => {
+      return eggs.filter(egg => (!egg.isHatched))
+    });
   } catch (err) {
     console.log(err)
     // TODO: Setup error handling.

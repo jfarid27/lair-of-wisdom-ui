@@ -9,7 +9,8 @@ import TableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 import Blockies from 'react-blockies';
 import { useState } from 'react';
-import { DragonActionName } from '../hooks/dragons';
+import { DragonActionName, DragonData } from '../hooks/dragons';
+import moment from 'moment';
 
 const useDragonActionStyles = makeStyles((theme) => ({
   modal: {
@@ -51,7 +52,7 @@ const useCardStyles = makeStyles((theme) => ({
 }));
 
 interface DragonCardProps {
-  dragon: any
+  dragon: DragonData
 }
 
 interface DragonActionProps {
@@ -107,11 +108,7 @@ function DragonAction ({ action, size, availableIn, callData, classes, updateCal
 }
 
 
-interface CallData {
-  [k: string]: {
-    [j: string]: string
-  }
-}
+type CallData = Record<DragonActionName, any>;
 
 /**
  * Component to showcase dragon data and drilldown.
@@ -122,20 +119,33 @@ export function DragonCard({ dragon } : DragonCardProps) {
   const classesCard = useCardStyles();
   const classesGrid = useActionStyles();
   const classesNeedsGrid = useNeedsStyles();
-  const [callData, updateCallData] = useState<CallData>({});
+  const [callData, updateCallData] = useState<CallData>({
+    [DragonActionName.Attack]: {},
+    [DragonActionName.Sleep]: {},
+    [DragonActionName.Feed]: {},
+    [DragonActionName.Clean]: {},
+    [DragonActionName.Play]: {},
+    [DragonActionName.Heal]: {},
+    [DragonActionName.ProposeBreed]: {},
+    [DragonActionName.AcceptBreed]: {}
+  });
 
   useEffect(() => {
     updateCallData(() => {
-      const callDatas: any = {};
-      for (const actionName in dragon.availableActions) {
-        const action = dragon.availableActions[actionName]
-        if (action.isCallData) {
-          callDatas[action.name] = {};
-        }
-      }
-      return callDatas;
+      return {
+        [DragonActionName.Attack]: {},
+        [DragonActionName.Sleep]: {},
+        [DragonActionName.Feed]: {},
+        [DragonActionName.Clean]: {},
+        [DragonActionName.Play]: {},
+        [DragonActionName.Heal]: {},
+        [DragonActionName.ProposeBreed]: {},
+        [DragonActionName.AcceptBreed]: {}
+      };
     });
   }, [dragon, dragon.availableActions]);
+
+  const timeNow = moment();
 
   return (<Grid item xs={3}>
     <Paper variant="outlined" className={classesCard.root}>
@@ -175,9 +185,9 @@ export function DragonCard({ dragon } : DragonCardProps) {
         <DragonAction key={DragonActionName.Play} action={dragon.availableActions[DragonActionName.Play]} size={6} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
         
         <DragonAction key={DragonActionName.Heal} action={dragon.availableActions[DragonActionName.Heal]} size={12} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
-        <DragonAction key={DragonActionName.Attack} action={dragon.availableActions[DragonActionName.Attack]} size={12} availableIn={dragon.realSecondsUntilAttack.toNumber()} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <DragonAction key={DragonActionName.Attack} action={dragon.availableActions[DragonActionName.Attack]} size={12} availableIn={timeNow.to(moment().add(dragon.realSecondsUntilAttack, 'seconds'))} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
         <DragonAction key={DragonActionName.ProposeBreed} action={dragon.availableActions[DragonActionName.ProposeBreed]} size={12} availableIn={0} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
-        <DragonAction key={DragonActionName.AcceptBreed} action={dragon.availableActions[DragonActionName.AcceptBreed]} size={12} availableIn={dragon.realSecondsUntilBreed.toNumber()} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
+        <DragonAction key={DragonActionName.AcceptBreed} action={dragon.availableActions[DragonActionName.AcceptBreed]} size={12} availableIn={timeNow.to(moment().add(dragon.realSecondsUntilBreed, 'seconds'))} callData={callData} updateCallData={updateCallData} classes={classesGrid} />
       </Grid>
     </Paper>
   </Grid>)

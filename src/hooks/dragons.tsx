@@ -62,7 +62,7 @@ export interface DragonData {
     realSecondsUntilBreed: string,
     realSecondsUntilAttack: string,
     realSecondsUntilUpgrade: string,
-    availableActions: [AvailableAction]
+    availableActions: Record<DragonActionName, AvailableAction>
 }
 
 export type DragonsGameState = Array<DragonData>;
