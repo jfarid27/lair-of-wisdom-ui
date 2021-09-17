@@ -3,6 +3,10 @@ import Onboard from 'bnc-onboard';
 import Web3 from 'web3';
 import setupContracts from "../actions/setupContracts";
 
+/**
+ * Holds logged in account data and information about the current web3 provider.
+ * @name AccountState
+ */
 interface AccountState {
   address?: string,
   web3?: any,
@@ -66,10 +70,11 @@ export const AccountContext = createContext<AccountContextInterface>({
 
 /**
  * Component mixer for the Account Context.
- * @param {*} param0 
+ * @name AccountContext
+ * @see AccountState
  * @returns ReactComponent
  */
-const Account: React.FC = ({ children }: any) => {
+const Account: React.FC = ({ children }) => {
   const [accountState, dispatch] = useState<AccountState>({});
   useEffect(() => {
     if (accountState.contracts) return;
