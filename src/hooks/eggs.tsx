@@ -32,7 +32,7 @@ export interface EggData {
     name: string,
     isHatched: boolean,
     userCanHatch: boolean,
-    secondsUntilHached: string,
+    secondsUntilHatched: string,
     numTributes: string,
     availableActions: [EggAvailableAction]
 }
@@ -51,7 +51,7 @@ async function updateEggsState(accountState: any, dispatch: any) {
       const [
         name,
         isHatched,
-        secondsUntilHached,
+        secondsUntilHatched,
         numTributes,
       ] = await Promise.all([
         egg.methods.name().call(),
@@ -60,7 +60,7 @@ async function updateEggsState(accountState: any, dispatch: any) {
         egg.methods.getTributes().call()
       ])
 
-      const userCanHatch = new BN(secondsUntilHached).lte(new BN('0'));
+      const userCanHatch = new BN(secondsUntilHatched).lte(new BN('0'));
 
       /**
        * List of availale actions for an instantiated Egg.
@@ -99,7 +99,7 @@ async function updateEggsState(accountState: any, dispatch: any) {
         name,
         isHatched,
         userCanHatch,
-        secondsUntilHached,
+        secondsUntilHatched,
         numTributes,
         availableActions: availableActions
       };
