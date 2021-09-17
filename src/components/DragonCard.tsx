@@ -147,7 +147,7 @@ export function DragonCard({ dragon } : DragonCardProps) {
 
   const timeNow = moment();
 
-  return (<Grid item xs={3}>
+  return (<Grid item xs={12} md={6} lg={3}>
     <Paper variant="outlined" className={classesCard.root}>
       <Blockies seed={dragon.address} size={30} />
       <h3>{dragon.name}</h3>

@@ -122,7 +122,7 @@ export function EggCard({ egg } : EggCardProps) {
 
   const timeUntilHatch = moment().to(moment().add(egg.secondsUntilHatched, 'seconds'));
 
-  return (<Grid item xs={3}>
+  return (<Grid item xs={12} md={6} lg={3}>
     <Paper variant="outlined" className={classesCard.root}>
       <Blockies seed={egg.address} size={30} />
       <h3>{egg.name}</h3>
