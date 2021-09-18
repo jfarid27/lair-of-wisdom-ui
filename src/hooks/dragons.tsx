@@ -221,7 +221,7 @@ async function fetchDragonData(accountState: any, dispatch: any, resetContracts:
       name: DragonActionName.ProposeBreed,
       Icon: FavoriteIcon,
       isCallData: true,
-      disabled: false, //!canProposeBreed,
+      disabled: !canProposeBreed,
       callData: ['address'],
       call: async (callData: any) => {
         await dragon.methods.proposeBreed(callData.address, callData.name).send({

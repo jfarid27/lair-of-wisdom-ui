@@ -153,6 +153,7 @@ export function DragonCard({ dragon } : DragonCardProps) {
     <Paper variant="outlined" className={classesCard.root}>
       <Blockies seed={dragon.address} size={30} />
       <h3>{dragon.name}</h3>
+      <a target="_blank" rel="noreferrer" href={"https://ftmscan.com/address/" + dragon.address}>Link</a>
       <h5>Trust: {dragon.playerTrust}</h5>
       
       <Table>
