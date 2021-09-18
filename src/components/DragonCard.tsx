@@ -98,7 +98,9 @@ function DragonAction ({ action, size, availableIn, callData, classes, updateCal
         <action.Icon />
         <h1>{action.name}</h1>
         { action.callData.map((item: any) => (
-        <input type="text" value={callData[action.name]} onChange={e => handleChange(e, item)} />
+          <div>
+            {item}: <input type="text" value={callData[action.name][item]} onChange={e => handleChange(e, item)} />
+          </div>
         ))}
         <Button color="primary" variant="contained" fullWidth onClick={() => action.call(callData[action.name])}>Confirm</Button>
         <Button fullWidth onClick={() => handleClose(false)}>Cancel</Button>
@@ -151,6 +153,7 @@ export function DragonCard({ dragon } : DragonCardProps) {
     <Paper variant="outlined" className={classesCard.root}>
       <Blockies seed={dragon.address} size={30} />
       <h3>{dragon.name}</h3>
+      <a target="_blank" rel="noreferrer" href={"https://ftmscan.com/address/" + dragon.address}>Link</a>
       <h5>Trust: {dragon.playerTrust}</h5>
       
       <Table>

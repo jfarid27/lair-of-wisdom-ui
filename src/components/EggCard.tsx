@@ -126,6 +126,7 @@ export function EggCard({ egg } : EggCardProps) {
     <Paper variant="outlined" className={classesCard.root}>
       <Blockies seed={egg.address} size={30} />
       <h3>{egg.name}</h3>
+      <a target="_blank" rel="noreferrer" href={"https://ftmscan.com/address/" + egg.address}>Link</a>
       <h5>Tributes: {egg.numTributes}</h5>
       <h5>Time Until Hatch: { timeUntilHatch }</h5>
 
